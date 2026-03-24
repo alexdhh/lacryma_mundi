@@ -1,184 +1,239 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
+/* src/App.css */
 
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-}
+/* --- IMPORT DE LA POLICE PIXÉLISÉE GOTHIQUE 'VT323' --- */
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
-.hero {
-  position: relative;
-
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
-}
-
-#center {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
-
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
-}
-
-#next-steps {
-  display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
-
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
-}
-
-#docs {
-  border-right: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-}
-
-#next-steps ul {
-  list-style: none;
+/* --- RÉINITIALISATION CSS DE BASE --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
   padding: 0;
-  display: flex;
-  gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
 }
 
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
+body {
+  background-color: #050505; /* Un fond noir très sombre */
+  overflow: hidden; /* Empêche les barres de défilement pour une immersion totale */
+  user-select: none; /* Empêche de surligner le texte */
 }
 
-.ticks {
+/* --- LA RÈGLE D'OR POUR LE PIXEL ART --- */
+/* (Appliquée à toutes les images et bordures avec la classe .pixel-art) */
+.pixel-art {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges; /* Pour Firefox */
+  image-rendering: crisp-edges;      /* Règle standard */
+}
+
+/* --- LE CONTENEUR PRINCIPAL DU JEU --- */
+.game-container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  text-align: center;
+}
+
+/* --- L'ÉCRAN D'INTRODUCTION (Room 0 / 'home') --- */
+.intro-screen {
   position: relative;
   width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center; /* Centre horizontalement */
+  align-items: center;    /* Centre verticalement */
+}
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
-  }
+/* --- L'IMAGE DE FOND EN PLEIN ÉCRAN GOTHIQUE --- */
+.intro-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Remplit tout l'espace sans déformer l'image */
+  z-index: 1; /* Place l'image au premier plan */
+}
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
-  }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
-  }
+/* --- LE CONTENU TEXTUEL ET LE BOUTON SUPERPOSÉS AU CENTRE --- */
+.intro-content {
+  position: relative;
+  z-index: 10; /* Texte tout au-dessus */
+  max-width: 900px;
+  background-color: rgba(10, 5, 10, 0.85); /* Un fond noir gothique semi-transparent */
+  padding: 50px;
+  border: 6px solid #595059; /* Bordure pixelisée gothique simple en pierre grise */
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px; /* Espace entre les éléments */
+  text-align: center;
+}
+
+/* --- TITRE GOTHIQUE --- */
+h1 {
+  font-family: 'VT323', monospace;
+  font-size: clamp(3rem, 6vw, 6rem); /* S'adapte intelligemment à l'écran */
+  color: #8b0000; /* Rouge sang gothique */
+  text-transform: uppercase;
+  letter-spacing: 8px;
+  line-height: 1.1;
+  text-shadow: 3px 3px 0 #000; /* Ombre portée nette pour le style pixel */
+}
+
+/* --- PARAGRAPHE DOUX --- */
+p {
+  font-family: 'VT323', monospace;
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  color: #b0a0b0; /* Couleur parchemin grise douce */
+  letter-spacing: 2px;
+}
+
+/* --- LE BOUTON GOTHIQUE INCASSABLE EN PUR CSS --- */
+.gothic-button-pure {
+  font-family: 'VT323', monospace;
+  font-size: 3rem;
+  color: #e8dbcd; /* Couleur os */
+  background-color: #2a202c; /* Pierre très sombre/violacée */
+  
+  /* Dimensions qui s'adaptent au texte */
+  padding: 15px 50px;
+  display: inline-block;
+  cursor: pointer;
+  
+  text-transform: uppercase;
+  letter-spacing: 6px;
+  
+  /* Le cadre extérieur noir net */
+  border: 4px solid #100b11; 
+  
+  /* La magie : des ombres internes pour sculpter le relief et le liseré rouge */
+  box-shadow: 
+    inset 0 0 0 4px #595059, /* Bordure interne en pierre grise */
+    inset 0 0 0 8px #8b0000, /* Liseré intérieur rouge sang */
+    6px 6px 0px rgba(0, 0, 0, 0.8); /* Ombre portée (Drop shadow) pixel-art */
+    
+  transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
+}
+
+/* État au survol */
+.gothic-button-pure:hover {
+  background-color: #3e2844; /* S'éclaire un peu */
+  color: #ffffff;
+}
+
+/* État cliqué (S'enfonce parfaitement) */
+.gothic-button-pure:active {
+  /* Le bouton descend physiquement */
+  transform: translate(4px, 4px); 
+  /* L'ombre portée rétrécit pour donner l'impression qu'il touche le fond */
+  box-shadow: 
+    inset 0 0 0 4px #595059, 
+    inset 0 0 0 8px #8b0000, 
+    2px 2px 0px rgba(0, 0, 0, 0.8); 
+}
+
+/* Style simple pour le contenu des salles (futur) */
+.room-content {
+  color: #e0e0e0;
+  font-family: 'VT323', monospace;
+  font-size: 2.5rem;
+  padding: 50px;
+}
+
+/* --- SCÈNE DE LA PORTE (door.tsx) --- */
+
+.door-scene-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* Pour placer le texte en bas */
+  align-items: center;
+  background-color: transparent; /* Fond transparent pour voir l'image */
+  position: relative;
+  overflow: hidden; /* Empêche les barres de défilement */
+}
+
+.door-wrapper {
+  position: absolute; /* L'image est positionnée de manière absolue */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; /* L'image est en arrière-plan */
+}
+
+.door-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* L'image remplit tout l'écran sans déformation */
+  cursor: default;
+  transition: filter 0.3s ease;
+}
+
+/* ... Hitboxes inchangées ... */
+.knocker {
+  position: absolute;
+  width: 6%;
+  height: 12%;
+  top: 48%;
+  cursor: pointer;
+  z-index: 10; /* Au-dessus de l'image */
+}
+.left-knocker { left: 42%; }
+.right-knocker { left: 52%; }
+
+/* --- TEXTE EN BAS DE L'IMAGE (Directement affiché) --- */
+.door-message-box {
+  margin-bottom: 20px; /* Espace par rapport au bas de l'écran */
+  padding: 0; /* Plus de padding, c'est juste du texte */
+  background-color: transparent; /* Fond transparent */
+  border: none; /* Pas de bordure */
+  border-radius: 0; /* Pas d'arrondi */
+  color: #e8dbcd;
+  font-family: 'VT323', monospace;
+  font-size: 3rem; /* Taille de police adaptée */
+  text-align: center;
+  z-index: 10; /* Au-dessus de l'image */
+  position: relative; /* Positionné par rapport au container */
+  width: 100%; /* Occupe toute la largeur */
+  max-width: none; /* Pas de largeur max */
+  box-shadow: none; /* Plus d'ombre */
+}
+
+.door-message-box p {
+  margin: 0;
+  /* Une ombre renforcée (façon contour) pour qu'il se lise parfaitement sur n'importe quel fond */
+  text-shadow: 3px 3px 0px #000, -2px -2px 0px #000, 2px -2px 0px #000, -2px 2px 0px #000, 2px 2px 0px #000;
+}
+
+/* --- FEEDBACK VISUEL QUAND LA PORTE EST DÉVERROUILLÉE --- */
+.door-wrapper.unlocked .door-image {
+  cursor: pointer; /* Le curseur se transforme enfin en petite main ! */
+}
+
+.door-wrapper.unlocked .door-image:hover {
+  filter: brightness(1.32); /* La porte s'éclaire légèrement pour inviter au clic */
+}
+
+/* À rajouter dans App.css si tu ne l'as pas encore fait */
+
+.intro-content {
+  transition: opacity 1.5s ease-in-out, transform 1.5s ease-in-out;
+}
+
+.intro-content.fade-out {
+  opacity: 0;
+  pointer-events: none; 
+  transform: scale(0.95);
+}
+
+.path-hitbox {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 45%;  
+  height: 50%; 
+  z-index: 5;  
+  cursor: pointer;
 }

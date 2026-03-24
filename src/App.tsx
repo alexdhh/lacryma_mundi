@@ -1,121 +1,81 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+// src/App.tsx
+import { useState } from 'react';
+import './App.css';
+import introBg from './assets/lm_scene1.jpg'; 
+import Room1 from './rooms/room1';
+
+// L'import avec le NOUVEAU nom
+import Door from './rooms/door'; 
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [currentLocation, setCurrentLocation] = useState('home');
+  // Nouvel état pour savoir si le joueur a cliqué sur "Commencer"
+  const [isPathReady, setIsPathReady] = useState(false);
+
+  // Étape 1 : Cache le menu et active le chemin
+  const handleStartGame = () => {
+    setIsPathReady(true);
+  };
+
+  // Étape 2 : Le clic sur le chemin mène à la porte
+  const handlePathClick = () => {
+    if (isPathReady) {
+      setCurrentLocation('porte');
+    }
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="game-container">
+      
+      {/* 1. ÉCRAN D'ACCUEIL */}
+      {currentLocation === 'home' && (
+        <div className="intro-screen">
+          <img src={introBg} alt="La Basilique" className="intro-background pixel-art" />
+          
+          {/* NOUVEAU : La hitbox du chemin (active uniquement après le clic sur Commencer) */}
+          {isPathReady && (
+            <div 
+              className="path-hitbox" 
+              onClick={handlePathClick}
+              title="Avancer vers la cathédrale"
+            ></div>
+          )}
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+          {/* Le conteneur du texte qui reçoit la classe 'fade-out' quand on commence */}
+          <div className={`intro-content ${isPathReady ? 'fade-out' : ''}`}>
+            <h1 className="pixel-art">Lacryma Mundi</h1>
+            <p className="pixel-art">La larme de crystal est gardée dans la cathédrale...</p>
+            <br />
+            <button 
+              onClick={handleStartGame} 
+              className="gothic-button-pure"
+            >
+              Commencer
+            </button>
+          </div>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {/* 2. SCÈNE DE LA PORTE (Appel du NOUVEAU composant) */}
+      {currentLocation === 'porte' && (
+        <Door onEnter={() => setCurrentLocation('porche')} />
+      )}
+
+      {/* 3. PREMIÈRE ÉPREUVE (Le Porche des Damnés) */}
+      {currentLocation === 'porche' && (
+        <Room1 onSolve={() => setCurrentLocation('nef')} />
+      )}
+      
+      {/* 4. LA NEF (Victoire temporaire) */}
+      {currentLocation === 'nef' && (
+        <div className="room-content">
+          <h2>La Grande Nef</h2>
+          <p>Bravo, vous avez survécu au Porche. La suite du cauchemar commence ici...</p>
+        </div>
+      )}
+
+    </div>
+  );
 }
 
-export default App
+export default App;
