@@ -3,6 +3,14 @@
 /* --- IMPORT DE LA POLICE PIXÉLISÉE GOTHIQUE 'VT323' --- */
 @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
+/* --- DÉCLARATION DE LA NOUVELLE POLICE --- */
+@font-face {
+  font-family: 'Uncial Antiqua';
+  src: url('./assets/fonts/UncialAntiqua-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 /* --- RÉINITIALISATION CSS DE BASE --- */
 * {
   box-sizing: border-box;
@@ -79,8 +87,7 @@ body {
   right: 0;
   width: 45%;  
   height: 50%; 
-  z-index: 5;  
-  cursor: pointer;
+  z-index: 5
 }
 
 /* --- TITRE GOTHIQUE --- */
@@ -369,4 +376,154 @@ p {
 
 .close-btn:hover {
   color: #ffffff;
+}
+
+
+/* =========================================
+   SCÈNE D'INTRODUCTION : LE PARCHEMIN
+   ========================================= */
+
+.parchment-intro-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #050505;
+}
+
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1; 
+}
+
+/* --- L'OVERLAY DU PARCHEMIN --- */
+.parchment-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 50; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.parchment-container {
+  position: relative;
+  width: 80%; 
+  max-width: 900px; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.parchment-scroll-image {
+  width: 100%;
+  image-rendering: pixelated; 
+  object-fit: contain;
+}
+
+/* --- POSITIONNEMENT DU TEXTE PAR-DESSUS --- */
+.parchment-text-area {
+  position: absolute;
+  top: 15%; 
+  bottom: 20%;
+  left: 10%;
+  right: 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+}
+
+.parchment-text-area p {
+  font-family: 'VT323', monospace; 
+  font-size: 2.2rem;
+  color: #1a1a1a; /* Texte sombre pour un parchemin clair */
+  line-height: 1.2;
+  margin: 0;
+  max-width: 90%;
+  text-shadow: none; /* Pas d'ombre sur le parchemin pour la lisibilité */
+}
+
+.fade-in {
+  animation: fadeIn 2s forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+
+/* =========================================
+   TRANSITIONS ET EFFETS DE MARCHE
+   ========================================= */
+
+.transition-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  z-index: 9999; 
+  opacity: 0;
+  pointer-events: none; 
+  transition: opacity 1.5s ease-in-out; 
+  
+  /* ✅ NOUVEAU : Flexbox pour centrer le texte dans le noir ✅ */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.transition-overlay.active {
+  opacity: 1;
+  pointer-events: auto; 
+}
+
+/* ✅ NOUVEAU : Le style du texte pendant la transition ✅ */
+.transition-text {
+  color: #e8dbcd;
+  font-family: 'VT323', monospace; /* Police normale */
+  font-size: 3rem;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 1s ease-in-out; /* Fondu du texte */
+  padding: 0 20px;
+}
+
+.transition-text.show {
+  opacity: 1;
+}
+
+/* L'effet de zoom */
+.walking-forward {
+  animation: walkZoom 2s ease-in forwards;
+}
+
+@keyframes walkZoom {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.3) translateY(5%); } 
+}
+
+.scene-fade-in {
+  animation: sceneAppear 1.5s ease-out forwards;
+}
+
+@keyframes sceneAppear {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
