@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import doorBg from '../assets/lm_scene2.png';
 
+
 interface DoorProps {
   onEnter: () => void;
 }
@@ -12,7 +13,7 @@ export default function Door({ onEnter }: DoorProps) {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [message, setMessage] = useState("Deux lourds heurtoirs vous font face...");
 
-  // Gère le clic sur un heurtoir
+  // Gère le clic sur un heurtoir (Inchangé)
   const handleKnock = (e: React.MouseEvent) => {
     e.stopPropagation(); // Empêche le clic de se propager à la porte derrière
     
@@ -30,7 +31,7 @@ export default function Door({ onEnter }: DoorProps) {
     }
   };
 
-  // Minuteur de 3 secondes déclenché après le 3ème coup
+  // Minuteur de 3 secondes déclenché après le 3ème coup (Inchangé)
   useEffect(() => {
     if (knockCount === 3) {
       const timer = setTimeout(() => {
@@ -44,8 +45,8 @@ export default function Door({ onEnter }: DoorProps) {
     }
   }, [knockCount]);
 
-  // Gère le clic sur la porte elle-même
-  const handleDoorClick = () => {
+  // Gère le clic pour tenter d'ouvrir la porte (Inchangé, mais utilisé différemment)
+  const handleDoorAttempt = () => {
     if (isUnlocked) {
       onEnter(); // Passe à la salle suivante !
     } else if (!isWaiting) {
@@ -56,19 +57,30 @@ export default function Door({ onEnter }: DoorProps) {
   return (
     <div className="door-scene-container pixel-art">
       <div className={`door-wrapper ${isUnlocked ? 'unlocked' : ''}`}>
-        {/* L'image de fond qui sert de porte */}
+        
+        {/* --- CORRECTION 1 : L'IMAGE N'A PLUS DE onClick --- */}
         <img 
           src={doorBg} 
           alt="Portes fermées" 
           className="door-image" 
-          onClick={handleDoorClick} 
+          /* onClick={handleDoorClick}  <-- Supprimé d'ici */
         />
         
-        {/* Les zones cliquables invisibles (Hitboxes) */}
+        {/* --- CORRECTION 2 : NOUVELLE ZONE DE CLIC SPÉCIFIQUE (Hitbox) --- */}
+        {/* Cette div recouvre uniquement le bois des portes au centre de l'image.
+            Elle est stylisée dans le CSS pour délimiter la zone cliquable précise. */}
+        <div 
+          className="door-interaction-hitbox" 
+          onClick={handleDoorAttempt}
+        ></div>
+
+        {/* Les zones cliquables invisibles pour les heurtoirs (Hitboxes) */}
         {!isUnlocked && (
           <>
-            <div className="knocker left-knocker" onClick={handleKnock}></div>
-            <div className="knocker right-knocker" onClick={handleKnock}></div>
+            {/* J'ai renommé les classes ici pour correspondre à notre DA : 
+                knocker-hitbox + position */}
+            <div className="knocker-hitbox left" onClick={handleKnock}></div>
+            <div className="knocker-hitbox right" onClick={handleKnock}></div>
           </>
         )}
       </div>

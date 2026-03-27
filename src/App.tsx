@@ -2,10 +2,8 @@
 import { useState } from 'react';
 import './App.css';
 import introBg from './assets/lm_scene1.jpg'; 
-import Room1 from './rooms/room1';
-
-// L'import avec le NOUVEAU nom
 import Door from './rooms/door'; 
+import Room1 from './rooms/room1';
 
 function App() {
   const [currentLocation, setCurrentLocation] = useState('home');
@@ -61,9 +59,9 @@ function App() {
         <Door onEnter={() => setCurrentLocation('porche')} />
       )}
 
-      {/* 3. PREMIÈRE ÉPREUVE (Le Porche des Damnés) */}
+      {/* 3. SCÈNE DU PORCHE (Le Regard des Veilleurs) */}
       {currentLocation === 'porche' && (
-        <Room1 onSolve={() => setCurrentLocation('nef')} />
+        <Room1 onSolve={() => setCurrentLocation('nef')} /> 
       )}
       
       {/* 4. LA NEF (Victoire temporaire) */}

@@ -1,113 +1,99 @@
-// src/rooms/Room1.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import bgImage from '../assets/lm_scene3.png';
 
-// 1. VOICI LA CORRECTION : On explique à TypeScript à quoi ressemble un objet du jeu
-interface Artifact {
-  id: string;
-  name: string;
-  type: 'beni' | 'maudit';
+type GargoyleId = 0 | 1 | 2 | 3 | 4;
+
+interface DialogState {
+  title: string;
+  text: string;
 }
 
-// 2. On applique ce "moule" (Artifact) à notre liste de départ
-const initialItems: Artifact[] = [
-  { id: '1', name: 'Calice Fêlé', type: 'maudit' },
-  { id: '2', name: 'Larme de Saint', type: 'beni' },
-  { id: '3', name: 'Dague Rituelle', type: 'maudit' },
-];
+interface Room1Props {
+  onSolve: () => void;
+}
 
-export default function Room1({ onSolve }: { onSolve: () => void }) {
-  // 3. On précise que nos zones vont contenir des tableaux d'Artifacts (<Artifact[]>)
-  const [inventory, setInventory] = useState<Artifact[]>(initialItems);
-  const [sacredZone, setSacredZone] = useState<Artifact[]>([]);
-  const [cursedZone, setCursedZone] = useState<Artifact[]>([]);
-  const [message, setMessage] = useState("Séparez le sacré du corrompu pour ouvrir la herse.");
+const CORRECT_SEQUENCE: GargoyleId[] = [2, 3, 4]; // Cornu, Dévoreur, Aveugle
 
-  // 4. On remplace 'item: any' par 'item: Artifact'
-  const handleDragStart = (e: React.DragEvent, item: Artifact, source: string) => {
-    e.dataTransfer.setData('item', JSON.stringify(item));
-    e.dataTransfer.setData('source', source);
-  };
+export default function Room1({ onSolve }: Room1Props) {
+  const [activeGargoyles, setActiveGargoyles] = useState<GargoyleId[]>([]);
+  const [isLacrymaLit, setIsLacrymaLit] = useState<boolean>(false);
+  const [isDoorOpen, setIsDoorOpen] = useState<boolean>(false);
+  const [dialog, setDialog] = useState<DialogState | null>(null);
 
-  const handleDragOver = (e: React.DragEvent) => e.preventDefault();
+  useEffect(() => {
+    if (dialog) {
+      const timer = setTimeout(() => setDialog(null), 8000);
+      return () => clearTimeout(timer);
+    }
+  }, [dialog]);
 
-  const handleDrop = (e: React.DragEvent, targetZone: string) => {
-    e.preventDefault();
-    const item = JSON.parse(e.dataTransfer.getData('item'));
-    const source = e.dataTransfer.getData('source');
+  const handleGargoyleClick = (id: GargoyleId) => {
+    if (isDoorOpen) return;
+    setDialog(null);
 
-    if (source === 'inventory') setInventory(prev => prev.filter(i => i.id !== item.id));
-    if (source === 'beni') setSacredZone(prev => prev.filter(i => i.id !== item.id));
-    if (source === 'maudit') setCursedZone(prev => prev.filter(i => i.id !== item.id));
-
-    if (targetZone === 'beni') setSacredZone(prev => [...prev, item]);
-    if (targetZone === 'maudit') setCursedZone(prev => [...prev, item]);
-    if (targetZone === 'inventory') setInventory(prev => [...prev, item]);
-  };
-
-  const checkWinCondition = () => {
-    if (inventory.length > 0) {
-      setMessage("Il reste des artefacts à trier...");
+    if (activeGargoyles.includes(id)) {
+      setActiveGargoyles(prev => prev.filter(g => g !== id));
       return;
     }
-    
-    const hasError = sacredZone.some(i => i.type !== 'beni') || cursedZone.some(i => i.type !== 'maudit');
-    
-    if (hasError) {
-      setMessage("Le mal se mêle au bien... Triez à nouveau !");
-    } else {
-      setMessage("La herse se lève dans un grincement sinistre...");
-      setTimeout(onSolve, 2000); 
+
+    if (activeGargoyles.length < 3) {
+      const newActive = [...activeGargoyles, id];
+      setActiveGargoyles(newActive);
+
+      if (newActive.length === 3) {
+        const isCorrect = [...newActive].sort().join() === [...CORRECT_SEQUENCE].sort().join();
+        if (isCorrect) {
+          setIsLacrymaLit(true);
+          setDialog({ title: "Révélation", text: "La Larme sculptée s'illumine... Elle semble attendre votre contact." });
+        } else {
+          setDialog({ title: "Erreur", text: "Un souffle glacé éteint les regards... Essayez encore." });
+          setTimeout(() => setActiveGargoyles([]), 1500);
+        }
+      }
+    }
+  };
+
+  const handleLacrymaClick = () => {
+    if (isLacrymaLit && !isDoorOpen) {
+      setIsDoorOpen(true);
+      setDialog({ title: "Passage Déverrouillé", text: "En touchant la Larme, un mécanisme millénaire s'active. La porte s'ouvre..." });
+      setTimeout(() => onSolve(), 4000);
+    } else if (!isLacrymaLit) {
+      setDialog({ title: "La Larme du Monde", text: "Une sculpture de pierre inerte. Quelque chose manque pour l'éveiller." });
     }
   };
 
   return (
-    <div className="room-container pixel-art">
-      <h2>Le Porche des Damnés</h2>
-      <p style={{ color: message.includes('mal') ? '#8b0000' : '#b0a0b0' }}>{message}</p>
-
-      <div className="puzzle-area">
+    <div className="room1-scene-container pixel-art">
+      <div className="room1-wrapper" style={{ backgroundImage: `url(${bgImage})` }}>
+        
+        {/* Hitboxes interactives */}
+        <div className="hitbox grimoire-hitbox" onClick={() => setDialog({ title: "Grimoire", text: "« Seuls le Dévoreur, l'Aveugle et le Cornu feront verser la Larme. »" })}></div>
+        <div className="hitbox door-hitbox" onClick={() => !isDoorOpen && setDialog({ title: "Porte", text: "Scellée par une magie ancienne." })}></div>
+        
+        {/* --- LA LARME --- */}
         <div 
-          className="drop-zone sacred-zone"
-          onDragOver={handleDragOver}
-          onDrop={(e) => handleDrop(e, 'beni')}
-        >
-          <h3>Sanctuaire</h3>
-          {sacredZone.map(item => (
-            <div key={item.id} className="artifact" draggable onDragStart={(e) => handleDragStart(e, item, 'beni')}>
-              {item.name}
-            </div>
-          ))}
+          className={`hitbox lacryma-hitbox ${isLacrymaLit ? 'lit' : ''}`} 
+          onClick={handleLacrymaClick} // <-- VÉRIFIE QUE CETTE LIGNE EST BIEN LÀ
+>
+        {/* Vide pour l'instant puisqu'on a enlevé le sprite */}
         </div>
 
-        <div 
-          className="drop-zone cursed-zone"
-          onDragOver={handleDragOver}
-          onDrop={(e) => handleDrop(e, 'maudit')}
-        >
-          <h3>Abysse</h3>
-          {cursedZone.map(item => (
-            <div key={item.id} className="artifact" draggable onDragStart={(e) => handleDragStart(e, item, 'maudit')}>
-              {item.name}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div 
-        className="inventory"
-        onDragOver={handleDragOver}
-        onDrop={(e) => handleDrop(e, 'inventory')}
-      >
-        {inventory.map(item => (
-          <div key={item.id} className="artifact" draggable onDragStart={(e) => handleDragStart(e, item, 'inventory')}>
-            {item.name}
+        {[0, 1, 2, 3, 4].map((id) => (
+          <div key={id} className={`hitbox gargoyle-hitbox g${id}`} onClick={() => handleGargoyleClick(id as GargoyleId)}>
+            <div className={`gargoyle-eye ${activeGargoyles.includes(id as GargoyleId) ? 'active' : ''}`}></div>
           </div>
         ))}
-      </div>
 
-      <button onClick={checkWinCondition} className="gothic-button-ornate" style={{ fontSize: '2rem', marginTop: '30px' }}>
-        Valider l'Offrande
-      </button>
+        {/* Dialogue */}
+        {dialog && (
+          <div className="room1-message-box">
+            <button className="close-btn" onClick={() => setDialog(null)}>×</button>
+            <h3>{dialog.title}</h3>
+            <p>{dialog.text}</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
