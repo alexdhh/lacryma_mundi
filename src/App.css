@@ -278,8 +278,8 @@ p {
 .hitbox {
   position: absolute;
   cursor: pointer;
-  background-color: rgba(255, 0, 0, 0.3) !important; /* Mode Debug ROUGE */
-  border: 1px solid yellow !important;
+  /* background-color: rgba(255, 0, 0, 0.3) !important; Mode Debug ROUGE */
+  /* border: 1px solid yellow !important; */
 }
 
 /* --- EFFET TREMBLEMENT DE TERRE --- */
@@ -314,11 +314,11 @@ p {
 }
 
 /* Nouvel arc de cercle recentré sur les têtes */
-.g0 { left: 14%; top: 25%; }
-.g1 { left: 17.8%; top: 14%; }
+.g0 { left: 13.8%; top: 25%; }
+.g1 { left: 17.8%; top: 13.2%; }
 .g2 { left: 23.5%; top: 10%; }
-.g3 { left: 28.5%; top: 18%; }
-.g4 { left: 32%; top: 31%; }
+.g3 { left: 29%; top: 18%; }
+.g4 { left: 31.8%; top: 31%; }
 
 /* --- Les yeux (feedback visuel centré) --- */
 .gargoyle-eye {
@@ -326,8 +326,8 @@ p {
   top: 50%; /* Recentré au milieu du visage */
   left: 50%; /* Recentré au milieu du visage */
   transform: translate(-50%, -50%); /* Forcer le centrage */
-  width: 6px;
-  height: 6px;
+  width: 90px;
+  height: 80px;
   background-color: #ff9900;
   border-radius: 50%;
   opacity: 0;
@@ -336,12 +336,12 @@ p {
 }
 
 .gargoyle-eye.active {
-  opacity: 1;
+  opacity: 0.175;
   box-shadow: 0 0 5px #ffb380, 0 0 15px #ff6600;
 }
 
-/* --- Boîte de dialogue UI intégrée --- */
-.room1-message-box {
+/* --- Boîte de dialogue UI intégrée (Globale) --- */
+.global-message-box {
   position: absolute;
   left: 50%;
   bottom: 8%;
@@ -357,7 +357,7 @@ p {
   text-align: center;
 }
 
-.room1-message-box h3 {
+.global-message-box h3 {
   color: #a83232;
   margin: 0 0 10px 0;
   font-size: 2.2rem;
@@ -366,7 +366,7 @@ p {
   text-shadow: 2px 2px 0 #000;
 }
 
-.room1-message-box p {
+.global-message-box p {
   margin: 0;
   font-size: 1.8rem;
   line-height: 1.3;

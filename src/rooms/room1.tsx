@@ -12,7 +12,8 @@ interface Room1Props {
   onSolve: () => void;
 }
 
-const CORRECT_SEQUENCE: GargoyleId[] = [2, 3, 4]; // Cornu, Dévoreur, Aveugle
+// ✅ NOUVELLE COMBINAISON : 0 (Tout à gauche), 3 et 4 (Les deux de droite)
+const CORRECT_SEQUENCE: GargoyleId[] = [0, 3, 4]; 
 
 export default function Room1({ onSolve }: Room1Props) {
   const [activeGargoyles, setActiveGargoyles] = useState<GargoyleId[]>([]);
