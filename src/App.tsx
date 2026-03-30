@@ -4,7 +4,8 @@ import './App.css';
 import introBg from './assets/lm_scene1.jpg'; 
 import Door from './rooms/door'; 
 import Room1 from './rooms/room1';
-import ParchmentIntro from './rooms/parchmentIntro'; 
+import ParchmentIntro from './rooms/parchmentIntro';
+import LmScenep from './rooms/lm_scenep'; 
 
 function App() {
   const [currentLocation, setCurrentLocation] = useState('home');
@@ -134,11 +135,10 @@ function App() {
         </div>
       )}
       
-      {/* 5. LA NEF */}
+      {/* 5. LA SALLE PRINCIPALE (lm_scenep) */}
       {currentLocation === 'nef' && (
-        <div className="room-content scene-fade-in">
-          <h2>La Grande Nef</h2>
-          <p>Bravo, vous avez survécu au Porche. La suite du cauchemar commence ici...</p>
+        <div className="scene-fade-in">
+          <LmScenep />
         </div>
       )}
 
