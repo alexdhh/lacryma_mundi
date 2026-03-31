@@ -1,5 +1,5 @@
 // src/rooms/lm_crypt.tsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import bgCrypt from '../assets/lm_crypt.png'; 
 
 interface DialogState {

@@ -1,5 +1,5 @@
 // src/rooms/lm_scenep.tsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import bgMain from '../assets/lm_scenep.png'; 
 import bgCorridor from '../assets/lm_scenep2.png';
 import bgArchive from '../assets/lm_archive.png';
