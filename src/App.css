@@ -278,22 +278,32 @@ p {
 .hitbox {
   position: absolute;
   cursor: pointer;
-  background-color: rgba(255, 0, 0, 0.3) !important; /* Mode Debug ROUGE */
-  border: 1px solid yellow !important;
+  /* background-color: rgba(255, 0, 0, 0.3) !important; Mode Debug ROUGE */
+  /* border: 1px solid yellow !important; */
+}
+
+/* --- EFFET TREMBLEMENT DE TERRE --- */
+.shake-screen {
+  animation: earthquake 0.4s infinite;
+}
+
+@keyframes earthquake {
+  0% { transform: translate(0px, 0px); }
+  10% { transform: translate(-4px, -2px); }
+  20% { transform: translate(4px, 2px); }
+  30% { transform: translate(-4px, 2px); }
+  40% { transform: translate(4px, -2px); }
+  50% { transform: translate(-2px, -4px); }
+  60% { transform: translate(2px, 4px); }
+  70% { transform: translate(-2px, 4px); }
+  80% { transform: translate(2px, -2px); }
+  90% { transform: translate(-4px, -2px); }
+  100% { transform: translate(0px, 0px); }
 }
 
 /* --- positions spécifiques --- */
 .grimoire-hitbox { left: 30%; top: 62%; width: 9%; height: 8%; }
 .door-hitbox { left: 59%; top: 32%; width: 11%; height: 32%; }
-
-.lacryma-hitbox { 
-  left: 20%; 
-  top: 40%; 
-  width: 5.5%; height: 9%; 
-  border-radius: 50% 50% 10% 10%;
-  background-color: rgba(255, 0, 0, 0.3) !important; /* On enlève la couleur Debug */
-  border: none !important;
-}
 
 /* --- ✅ CORRECTIFS : Les 5 Gargouilles de gauche --- */
 /* Hitboxes R0NDES et petites pour éviter le chevauchement */
@@ -304,11 +314,11 @@ p {
 }
 
 /* Nouvel arc de cercle recentré sur les têtes */
-.g0 { left: 14%; top: 25%; }
-.g1 { left: 17.8%; top: 14%; }
+.g0 { left: 13.8%; top: 25%; }
+.g1 { left: 17.8%; top: 13.2%; }
 .g2 { left: 23.5%; top: 10%; }
-.g3 { left: 28.5%; top: 18%; }
-.g4 { left: 32%; top: 31%; }
+.g3 { left: 29%; top: 18%; }
+.g4 { left: 31.8%; top: 31%; }
 
 /* --- Les yeux (feedback visuel centré) --- */
 .gargoyle-eye {
@@ -316,8 +326,8 @@ p {
   top: 50%; /* Recentré au milieu du visage */
   left: 50%; /* Recentré au milieu du visage */
   transform: translate(-50%, -50%); /* Forcer le centrage */
-  width: 6px;
-  height: 6px;
+  width: 90px;
+  height: 80px;
   background-color: #ff9900;
   border-radius: 50%;
   opacity: 0;
@@ -326,12 +336,12 @@ p {
 }
 
 .gargoyle-eye.active {
-  opacity: 1;
+  opacity: 0.175;
   box-shadow: 0 0 5px #ffb380, 0 0 15px #ff6600;
 }
 
-/* --- Boîte de dialogue UI intégrée --- */
-.room1-message-box {
+/* --- Boîte de dialogue UI intégrée (Globale) --- */
+.global-message-box {
   position: absolute;
   left: 50%;
   bottom: 8%;
@@ -347,7 +357,7 @@ p {
   text-align: center;
 }
 
-.room1-message-box h3 {
+.global-message-box h3 {
   color: #a83232;
   margin: 0 0 10px 0;
   font-size: 2.2rem;
@@ -356,7 +366,7 @@ p {
   text-shadow: 2px 2px 0 #000;
 }
 
-.room1-message-box p {
+.global-message-box p {
   margin: 0;
   font-size: 1.8rem;
   line-height: 1.3;
