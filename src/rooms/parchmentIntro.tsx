@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+// src/rooms/parchmentIntro.tsx
+import { useState, useEffect, useRef } from 'react';
 import parchmentImg from '../assets/lm_parchemin.png'; 
 
 interface ParchmentIntroProps {
@@ -12,36 +13,62 @@ const introScript = [
   "« Elle est là, au plus profond de la Basilique des Mille Soupirs. Elle t'appelle à travers la pierre... Ramène la Larme, et trouve enfin le repos. »"
 ];
 
+// Hook modifié pour gérer l'état "en cours d'écriture" et le "skip"
 const useTypewriter = (text: string, speed: number = 20) => {
   const [displayText, setDisplayText] = useState('');
+  const [isTyping, setIsTyping] = useState(true);
+  const intervalRef = useRef<number | null>(null);
 
   useEffect(() => {
     setDisplayText(''); 
+    setIsTyping(true);
     let charIndex = 0;
-    const intervalId = setInterval(() => {
+
+    // On nettoie l'ancien intervalle au cas où
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
+    intervalRef.current = window.setInterval(() => {
       if (charIndex < text.length) {
-        setDisplayText((prev) => prev + text.charAt(charIndex));
+        setDisplayText(text.slice(0, charIndex + 1));
         charIndex++;
       } else {
-        clearInterval(intervalId);
+        setIsTyping(false);
+        if (intervalRef.current) clearInterval(intervalRef.current);
       }
     }, speed);
 
-    return () => clearInterval(intervalId);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [text, speed]);
 
-  return displayText;
+  // Fonction pour tout afficher d'un coup
+  const skip = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    setDisplayText(text);
+    setIsTyping(false);
+  };
+
+  return { displayText, isTyping, skip };
 };
 
 export default function ParchmentIntro({ onIntroFinished }: ParchmentIntroProps) {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
-  const typedText = useTypewriter(introScript[currentTextIndex], 25);
+  
+  // On récupère les nouvelles variables du hook
+  const { displayText: typedText, isTyping, skip } = useTypewriter(introScript[currentTextIndex], 25);
 
   const handleParchmentClick = () => {
-    if (currentTextIndex < introScript.length - 1) {
-      setCurrentTextIndex(prev => prev + 1);
+    if (isTyping) {
+      // Si on est en train d'écrire, on affiche tout instantanément
+      skip();
     } else {
-      onIntroFinished();
+      // Si le texte est déjà complètement affiché, on passe au suivant
+      if (currentTextIndex < introScript.length - 1) {
+        setCurrentTextIndex(prev => prev + 1);
+      } else {
+        onIntroFinished();
+      }
     }
   };
 
@@ -71,14 +98,13 @@ export default function ParchmentIntro({ onIntroFinished }: ParchmentIntroProps)
         }} 
       />
 
-      {/* ✅ Bords ultra resserrés (38%) pour que rien ne dépasse ✅ */}
       <div 
         style={{
           position: 'absolute',
           top: '25%',  
           bottom: '25%',
-          left: '38%', /* <-- Marge augmentée pour écraser le texte */
-          right: '38%', /* <-- Marge augmentée pour écraser le texte */
+          left: '38%', 
+          right: '38%', 
           zIndex: 10,
           display: 'flex',
           flexDirection: 'column',
@@ -86,9 +112,8 @@ export default function ParchmentIntro({ onIntroFinished }: ParchmentIntroProps)
           textAlign: 'center'
         }}
       >
-        {/* ✅ Titre avec la NOUVELLE police Uncial Antiqua ✅ */}
         <h1 style={{
-          fontFamily: "'Uncial Antiqua', serif", /* <-- Changé ici ! */
+          fontFamily: "'Uncial Antiqua', serif",
           fontSize: '3.5rem',
           color: '#a83232', 
           marginBottom: '2rem', 
@@ -100,17 +125,29 @@ export default function ParchmentIntro({ onIntroFinished }: ParchmentIntroProps)
           LACRYMA MUNDI
         </h1>
 
-        {/* ✅ Paragraphe normal ✅ */}
         <p style={{ 
           fontFamily: "'Uncial Antiqua', serif", 
-          fontSize: '1.8rem', /* Légèrement réduit pour bien tenir dans la nouvelle largeur */
+          fontSize: '1.8rem', 
           color: '#1a1a1a', 
           margin: 0,
           textShadow: 'none',
-          lineHeight: '1.4'
+          lineHeight: '1.4',
+          minHeight: '150px' /* Garde une hauteur fixe pour éviter que le texte ne "saute" */
         }}>
           {typedText}
         </p>
+
+        {/* Petit indicateur visuel (optionnel) pour faire comprendre au joueur qu'il peut cliquer */}
+        {!isTyping && (
+          <span style={{ 
+            marginTop: '20px', 
+            fontSize: '1.5rem', 
+            color: '#a83232',
+            animation: 'pulse 1.5s infinite' 
+          }}>
+            ▼
+          </span>
+        )}
       </div>
     </div>
   );

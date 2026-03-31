@@ -1,5 +1,5 @@
 // src/rooms/lm_scenep.tsx
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import bgMain from '../assets/lm_scenep.png'; 
 import bgCorridor from '../assets/lm_scenep2.png';
 import bgArchive from '../assets/lm_archive.png';
@@ -19,27 +19,30 @@ export default function LmScenep() {
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [showBloodChoice, setShowBloodChoice] = useState(false);
 
-  // NOUVEAU: État pour les effets visuels
+  // Effets visuels (On a complètement retiré les tremblements)
   const [screenEffect, setScreenEffect] = useState<string>('');
 
+  // Inventaire
   const [hasPlume, setHasPlume] = useState(false); 
   const [hasWoodenHandle, setHasWoodenHandle] = useState(false);
   const [hasRuneStone, setHasRuneStone] = useState(false);
   const [hasIronKey, setHasIronKey] = useState(false);
 
+  // Sceaux
   const [hasPastSeal, setHasPastSeal] = useState(false);
   const [hasPresentSeal, setHasPresentSeal] = useState(false);
   const [hasFutureSeal, setHasFutureSeal] = useState(false);
 
-  // NOUVEAU: Fonction pour déclencher un effet (dure 1 seconde max)
-  const triggerEffect = (effectClass: string) => {
+  // Déclencheurs d'effets (Flash de couleur par-dessus l'écran)
+  const triggerFlash = (effectClass: string, duration = 1000) => {
     setScreenEffect(effectClass);
-    setTimeout(() => setScreenEffect(''), 1000);
+    setTimeout(() => setScreenEffect(''), duration);
   };
 
+  // Timer ajusté à 6 secondes (6000 ms)
   useEffect(() => {
     if (dialog && !showBloodChoice) {
-      const timer = setTimeout(() => setDialog(null), 8000);
+      const timer = setTimeout(() => setDialog(null), 6000);
       return () => clearTimeout(timer);
     }
   }, [dialog, showBloodChoice]);
@@ -56,11 +59,10 @@ export default function LmScenep() {
   };
 
   return (
-    // On ajoute la classe de secousse sur le conteneur global si besoin
-    <div className={`room-container pixel-art fade-in ${screenEffect === 'shake-screen' ? 'shake-screen' : ''}`} style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden' }}>
+    <div className="room-container pixel-art fade-in" style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', backgroundColor: '#000' }}>
       
-      {/* NOUVEAU: Calque d'effet de couleur par-dessus l'écran */}
-      <div className={`overlay-effect ${screenEffect !== 'shake-screen' ? screenEffect : ''}`}></div>
+      {/* Calque d'effets lumineux (Poussière, Magie, Sang...) */}
+      <div className={`overlay-effect ${screenEffect}`}></div>
 
       <img 
         src={
@@ -77,19 +79,43 @@ export default function LmScenep() {
       {/* ================= VUE PRINCIPALE ================= */}
       {currentView === 'main' && !isBookOpen && !dialog && (
         <>
-          <div onClick={() => setIsBookOpen(true)} style={{ position: 'absolute', bottom: '10%', left: '16%', width: '15%', height: '18%', cursor: 'pointer', zIndex: 10 }} />
+          {/* OBJETS DE DÉCOR INTERACTIFS */}
+          <div 
+            onClick={() => {
+              triggerFlash('flash-dust');
+              setDialog({ title: "BOUGIES", text: "Leurs flammes vacillent étrangement, comme si la pièce respirait..." });
+            }} 
+            style={{ position: 'absolute', bottom: '25%', left: '8%', width: '8%', height: '15%', cursor: 'pointer', zIndex: 10 }} 
+          />
+          <div 
+            onClick={() => {
+              setDialog({ title: "BIBLIOTHÈQUE", text: "Des milliers d'ouvrages poussiéreux. Certains sont écrits dans des langues mortes depuis des millénaires." });
+            }} 
+            style={{ position: 'absolute', top: '15%', left: '4%', width: '12%', height: '50%', cursor: 'pointer', zIndex: 10 }} 
+          />
+
+          {/* BUREAU & NAVIGATION */}
+          <div 
+            onClick={() => {
+              setIsBookOpen(true);
+            }} 
+            style={{ position: 'absolute', bottom: '10%', left: '16%', width: '15%', height: '18%', cursor: 'pointer', zIndex: 10 }} 
+          />
           <div onClick={() => setCurrentView('archive')} style={{ position: 'absolute', top: '25%', left: '18%', width: '12%', height: '45%', cursor: 'pointer', zIndex: 10 }} />
           <div onClick={() => setCurrentView('corridor')} style={{ position: 'absolute', bottom: '10%', left: '40%', width: '20%', height: '20%', cursor: 'pointer', zIndex: 10 }} />
 
           {/* PORTE EN BOIS (Passé) */}
           <div 
             onClick={() => {
-              if (hasPastSeal) setDialog({ title: "PASSAGE DE TERRE", text: "Le Passage de Terre est déjà ouvert." });
-              else if (hasWoodenHandle) {
-                triggerEffect('shake-screen'); // Effet de lourdeur
-                setDialog({ title: "PASSAGE DE TERRE", text: "Vous insérez la poignée en bois de chêne. La porte s'entrouvre...\nVous obtenez le Sceau du Passé !" });
+              if (hasPastSeal) {
+                setDialog({ title: "PASSAGE DE TERRE", text: "Le Passage de Terre est déjà ouvert." });
+              } else if (hasWoodenHandle) {
+                triggerFlash('flash-dust-heavy', 1500); // Gros nuage de poussière
+                setDialog({ title: "PASSAGE DE TERRE", text: "Vous insérez la poignée en bois de chêne. La porte s'entrouvre dans un nuage de poussière...\nVous obtenez le Sceau du Passé !" });
                 setHasPastSeal(true);
-              } else setDialog({ title: "PASSAGE DE TERRE", text: "Cette lourde porte en bois n'a pas de poignée. Elle est bloquée." });
+              } else {
+                setDialog({ title: "PASSAGE DE TERRE", text: "Cette lourde porte en bois n'a pas de poignée. Elle est bloquée." });
+              }
             }}
             style={{ position: 'absolute', top: '40%', left: '61%', width: '6%', height: '35%', cursor: 'pointer', zIndex: 10 }}
           />
@@ -97,12 +123,15 @@ export default function LmScenep() {
           {/* GRILLE DE FER (Présent) */}
           <div 
             onClick={() => {
-              if (hasPresentSeal) setDialog({ title: "GRILLE DE FER", text: "La Grille de Fer est déjà ouverte." });
-              else if (hasIronKey) {
-                triggerEffect('shake-screen'); // Effet de lourdeur métallique
+              if (hasPresentSeal) {
+                setDialog({ title: "GRILLE DE FER", text: "La Grille de Fer est déjà ouverte." });
+              } else if (hasIronKey) {
+                triggerFlash('flash-spark'); // Étincelle métallique
                 setDialog({ title: "GRILLE DE FER", text: "La lourde clé tourne dans la serrure dans un grincement aigu...\nVous obtenez le Sceau du Présent !" });
                 setHasPresentSeal(true);
-              } else setDialog({ title: "GRILLE DE FER", text: "Une solide grille de fer. Il vous faut une clé pour passer." });
+              } else {
+                setDialog({ title: "GRILLE DE FER", text: "Une solide grille de fer. Il vous faut une clé pour passer." });
+              }
             }}
             style={{ position: 'absolute', top: '35%', left: '71%', width: '8%', height: '45%', cursor: 'pointer', zIndex: 10 }}
           />
@@ -110,21 +139,24 @@ export default function LmScenep() {
           {/* ARCHE RUNIQUE (Avenir) */}
           <div 
             onClick={() => {
-              if (hasFutureSeal) setDialog({ title: "VOIE DU CIEL", text: "La Voie du Ciel est déjà ouverte." });
-              else if (hasRuneStone) {
-                triggerEffect('flash-magic'); // Effet magique bleu
+              if (hasFutureSeal) {
+                setDialog({ title: "VOIE DU CIEL", text: "La Voie du Ciel est déjà ouverte." });
+              } else if (hasRuneStone) {
+                triggerFlash('flash-magic'); // Éclat bleu
                 setDialog({ title: "VOIE DU CIEL", text: "Vous insérez la pierre. Les runes s'illuminent d'un éclat bleu...\nVous obtenez le Sceau de l'Avenir !" });
                 setHasFutureSeal(true);
-              } else setDialog({ title: "VOIE DU CIEL", text: "Une arche couverte de runes éteintes. Un emplacement circulaire est vide au centre." });
+              } else {
+                setDialog({ title: "VOIE DU CIEL", text: "Une arche couverte de runes éteintes. Un emplacement circulaire est vide au centre." });
+              }
             }}
             style={{ position: 'absolute', top: '15%', left: '83%', width: '15%', height: '75%', cursor: 'pointer', zIndex: 10 }}
           />
 
-          {/* NEF SACRÉE */}
+          {/* NEF SACRÉE (Sans tremblement, juste la magie) */}
           <div 
             onClick={() => {
               if (hasPastSeal && hasPresentSeal && hasFutureSeal) {
-                triggerEffect('shake-screen'); // Grosse secousse finale
+                triggerFlash('flash-magic');
                 setDialog({ title: "NEF SACRÉE", text: "Les trois Sceaux s'illuminent ! La grande double porte s'ouvre avec un fracas sourd... Vous pouvez passer à la suite !" });
               } else {
                 setDialog({ title: "NEF SACRÉE", text: "La Nef sacrée est scellée. Il vous manque des Sceaux pour l'ouvrir." });
@@ -139,7 +171,13 @@ export default function LmScenep() {
       {currentView === 'corridor' && !dialog && (
         <>
           <div onClick={() => setCurrentView('ladder')} style={{ position: 'absolute', top: '30%', left: '10%', width: '15%', height: '60%', cursor: 'pointer', zIndex: 10 }} />
-          <div onClick={() => setCurrentView('statue')} style={{ position: 'absolute', top: '45%', left: '68%', width: '15%', height: '45%', cursor: 'pointer', zIndex: 10 }} />
+          <div 
+            onClick={() => {
+              triggerFlash('flash-dark'); // Ambience sombre en s'approchant
+              setCurrentView('statue');
+            }} 
+            style={{ position: 'absolute', top: '45%', left: '68%', width: '15%', height: '45%', cursor: 'pointer', zIndex: 10 }} 
+          />
         </>
       )}
 
@@ -148,14 +186,16 @@ export default function LmScenep() {
         <div 
           onClick={() => {
             if (!hasWoodenHandle) {
-              triggerEffect('flash-item'); // Flash doré pour l'objet
-              setDialog({ title: "ARCHIVES OUBLIÉES", text: "Vous fouillez les parchemins narrant l'histoire des premiers rois...\nAu fond d'une caisse, vous trouvez une Poignée en Bois de Chêne." });
+              triggerFlash('flash-dust-heavy', 1500); 
+              setDialog({ title: "ARCHIVES OUBLIÉES", text: "En déplaçant de lourds grimoires, un épais nuage de poussière s'élève...\nAu fond d'une caisse, vous trouvez une Poignée en Bois de Chêne." });
               setHasWoodenHandle(true);
             } else {
-              setDialog({ title: "ARCHIVES OUBLIÉES", text: "Il n'y a plus rien d'utile ici, seulement de vieux parchemins illisibles." });
+              triggerFlash('flash-dust');
+              setDialog({ title: "ARCHIVES OUBLIÉES", text: "Il n'y a plus rien d'utile ici. Seulement de vieux parchemins rongés par les mites." });
             }
           }}
-          style={{ position: 'absolute', top: '40%', left: '40%', width: '20%', height: '40%', cursor: 'pointer', zIndex: 10 }}
+          style={{ position: 'absolute', top: '60%', left: '43%', width: '12%', height: '12%', cursor: 'pointer', zIndex: 10 }}
+          title="Examiner l'objet en bois"
         />
       )}
 
@@ -164,14 +204,15 @@ export default function LmScenep() {
         <div 
           onClick={() => {
             if (!hasRuneStone) {
-              triggerEffect('flash-magic'); // Flash magique
-              setDialog({ title: "ÉCHELLE", text: "Vous grimpez tout en haut de l'échelle. À travers la petite lucarne, la lune éclaire un objet...\nVous trouvez une Pierre Runique Bleutée." });
+              triggerFlash('flash-magic'); 
+              setDialog({ title: "ÉCHELLE FRAGILE", text: "L'échelle grince sous votre poids... À travers la lucarne, la lune éclaire un objet.\nVous trouvez une Pierre Runique Bleutée !" });
               setHasRuneStone(true);
             } else {
-              setDialog({ title: "ÉCHELLE", text: "Vous avez déjà récupéré la pierre runique. L'étagère est vide." });
+              setDialog({ title: "ÉCHELLE FRAGILE", text: "Vous avez déjà récupéré la pierre runique. Il vaut mieux redescendre avant que le bois ne cède." });
             }
           }}
-          style={{ position: 'absolute', top: '25%', left: '55%', width: '15%', height: '20%', cursor: 'pointer', zIndex: 10 }}
+          style={{ position: 'absolute', top: '22%', left: '57%', width: '8%', height: '16%', cursor: 'pointer', zIndex: 10 }}
+          title="Prendre la pierre runique"
         />
       )}
 
@@ -180,10 +221,10 @@ export default function LmScenep() {
         <div 
           onClick={() => {
             if (!hasIronKey) {
-              setDialog({ title: "STATUE ENCAPUCHONNÉE", text: "La statue de pierre serre un objet dans sa main gauche.\nUne inscription à ses pieds indique : « Seul le sang versé au présent libère le fer »." });
+              setDialog({ title: "STATUE MACABRE", text: "La statue semble presque vivante... Elle serre un objet dans sa main droite.\nUne inscription sanglante indique : « Seul le sang versé au présent libère le fer »." });
               setShowBloodChoice(true);
             } else {
-              setDialog({ title: "STATUE ENCAPUCHONNÉE", text: "La statue a déjà relâché la clé. Sa main de pierre est vide." });
+              setDialog({ title: "STATUE MACABRE", text: "La statue a relâché son emprise. Sa main de pierre, couverte de votre sang, est désormais vide." });
             }
           }}
           style={{ position: 'absolute', top: '20%', left: '30%', width: '40%', height: '60%', cursor: 'pointer', zIndex: 10 }}
@@ -209,8 +250,8 @@ export default function LmScenep() {
               {hasPlume ? (
                 <button 
                   onClick={() => {
-                    triggerEffect('flash-blood'); // Flash rouge intense
-                    setDialog({ title: "STATUE ENCAPUCHONNÉE", text: "Vous utilisez la plume pour vous piquer le doigt. Quelques gouttes tombent...\nLa statue lâche une Lourde Clé en Fer." });
+                    triggerFlash('flash-blood'); // Gros Flash rouge
+                    setDialog({ title: "SACRIFICE", text: "Vous enfoncez la plume dans votre paume. La douleur est vive.\nAu contact du sang, la statue entrouvre ses doigts et laisse tomber une Lourde Clé en Fer." });
                     setHasIronKey(true);
                     setShowBloodChoice(false);
                   }}
@@ -219,7 +260,7 @@ export default function LmScenep() {
                   Se piquer avec la plume
                 </button>
               ) : (
-                <p style={{ color: '#888', fontStyle: 'italic', fontSize: '1.2rem', fontFamily: "'VT323', monospace", margin: 0 }}>(Il vous faudrait un objet pointu pour verser le sang...)</p>
+                <p style={{ color: '#888', fontStyle: 'italic', fontSize: '1.2rem', fontFamily: "'VT323', monospace", margin: 0 }}>(Il vous faudrait un objet pointu pour verser votre propre sang...)</p>
               )}
             </div>
           )}
@@ -231,20 +272,20 @@ export default function LmScenep() {
         <div onClick={() => setIsBookOpen(false)} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 100, display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}>
           <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative', width: '95vw', maxWidth: '1400px', aspectRatio: '16/9', backgroundImage: `url(${bookImage})`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
             
-            {/* Plume restreinte à l'encrier */}
+            {/* Hitbox de la plume AGRANDIE pour couvrir tout l'encrier */}
             <div 
               onClick={(e) => {
                 e.stopPropagation(); 
                 if (!hasPlume) {
-                  triggerEffect('flash-item'); // Flash doré
-                  setDialog({ title: "BUREAU", text: "Vous prenez la plume affûtée, encore humide d'encre sombre." });
+                  triggerFlash('flash-item'); 
+                  setDialog({ title: "BUREAU", text: "Vous prenez la plume affûtée. Sa pointe est incroyablement coupante." });
                   setHasPlume(true);
                   setIsBookOpen(false); 
                 } else {
-                  setDialog({ title: "BUREAU", text: "L'encrier est désormais vide." });
+                  setDialog({ title: "BUREAU", text: "L'encrier est vide. L'encre a séché depuis longtemps." });
                 }
               }}
-              style={{ position: 'absolute', bottom: '12%', right: '13%', width: '8%', height: '45%', cursor: 'pointer', zIndex: 110 }}
+              style={{ position: 'absolute', bottom: '10%', right: '10%', width: '12%', height: '50%', cursor: 'pointer', zIndex: 110 }}
             />
 
             {/* TEXTES DU LIVRE */}
@@ -260,6 +301,9 @@ export default function LmScenep() {
               <p style={{ color: '#000000', fontSize: 'clamp(0.6rem, 1vw, 1.3rem)', lineHeight: '1.4', margin: '15px 0 0 0', fontStyle: 'italic' }}>"Rappelez-vous ces trois piliers, car ils sont la clé de la Nef sacrée."</p>
             </div>
           </div>
+          <p style={{ position: 'absolute', bottom: '20px', width: '100%', textAlign: 'center', color: '#fff', fontFamily: "'VT323', monospace", fontSize: '1.5rem', textShadow: '2px 2px 0 #000' }}>
+            (Cliquez en dehors du livre pour le fermer)
+          </p>
         </div>
       )}
     </div>

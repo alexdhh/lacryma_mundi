@@ -2,11 +2,6 @@
 import { useState, useEffect } from 'react';
 import doorBg from '../assets/lm_scene2.png';
 
-interface DialogState {
-  title: string;
-  text: string;
-}
-
 interface DoorProps {
   onEnter: () => void;
 }
@@ -16,91 +11,93 @@ export default function Door({ onEnter }: DoorProps) {
   const [isWaiting, setIsWaiting] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(false);
   
-  // ✅ On utilise maintenant le même système de dialogue que room1
-  const [dialog, setDialog] = useState<DialogState | null>({
-    title: "La Grande Porte",
-    text: "Deux lourds heurtoirs vous font face..."
-  });
+  // Retour au simple message texte
+  const [message, setMessage] = useState<string | null>("Deux lourds heurtoirs vous font face...");
 
-  // Auto-fermeture de la boîte de dialogue après 8 secondes (comme dans room1)
+  // Disparition du texte après 6 secondes
   useEffect(() => {
-    if (dialog) {
-      const timer = setTimeout(() => setDialog(null), 8000);
+    if (message) {
+      const timer = setTimeout(() => setMessage(null), 6000);
       return () => clearTimeout(timer);
     }
-  }, [dialog]);
+  }, [message]);
 
-  // Gère le clic sur un heurtoir
   const handleKnock = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Empêche le clic de se propager à la porte derrière
-    
-    // Si on a déjà cliqué 3 fois ou que la porte est ouverte, on ignore les clics
+    e.stopPropagation();
     if (knockCount >= 3 || isUnlocked) return;
 
     const newCount = knockCount + 1;
     setKnockCount(newCount);
 
-    if (newCount === 1) setDialog({ title: "Heurtoir", text: "BAM... Un écho sourd résonne." });
-    if (newCount === 2) setDialog({ title: "Heurtoir", text: "BAM... La pierre tremble légèrement." });
+    if (newCount === 1) {
+      setMessage("BAM... Un écho sourd résonne.");
+    }
+    if (newCount === 2) {
+      setMessage("BAM... BAM... La pierre tremble légèrement.");
+    }
     if (newCount === 3) {
-      setDialog({ title: "Heurtoir", text: "BAM... Un silence pesant s'installe..." });
+      setMessage("BAM... BAM... BAM... Un silence pesant s'installe...");
       setIsWaiting(true);
     }
   };
 
-  // Minuteur de 3 secondes déclenché après le 3ème coup
   useEffect(() => {
     if (knockCount === 3) {
       const timer = setTimeout(() => {
         setIsUnlocked(true);
         setIsWaiting(false);
-        setDialog({ title: "Mécanisme Déverrouillé", text: "Un lourd mécanisme se déverrouille. La porte cède..." });
-      }, 3000); // 3000 millisecondes = 3 secondes
+        setMessage("Un lourd mécanisme interne s'active. La porte cède...");
+      }, 3000);
 
-      // Nettoyage du timer si le composant est démonté avant la fin des 3s
       return () => clearTimeout(timer);
     }
   }, [knockCount]);
 
-  // Gère le clic pour tenter d'ouvrir la porte
   const handleDoorAttempt = () => {
     if (isUnlocked) {
-      onEnter(); // Passe à la salle suivante !
+      onEnter();
     } else if (!isWaiting) {
-      setDialog({ title: "Porte Scellée", text: "La porte est fermée de l'intérieur. Tirer ne sert à rien." });
+      setMessage("La porte est fermée de l'intérieur. Tirer ne sert à rien.");
     }
   };
 
   return (
-    <div className="door-scene-container pixel-art">
-      <div className={`door-wrapper ${isUnlocked ? 'unlocked' : ''}`}>
-        
+    <div className="door-scene-container pixel-art fade-in" style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', backgroundColor: '#000' }}>
+      
+      <div className={`door-wrapper ${isUnlocked ? 'unlocked' : ''}`} style={{ width: '100%', height: '100%', position: 'absolute' }}>
         <img 
           src={doorBg} 
           alt="Portes fermées" 
           className="door-image" 
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
         
+        {/* Hitbox pour ouvrir la porte une fois déverrouillée */}
         <div 
           className="door-interaction-hitbox" 
           onClick={handleDoorAttempt}
+          style={{ position: 'absolute', top: '20%', left: '40%', width: '20%', height: '60%', cursor: isUnlocked ? 'pointer' : 'default', zIndex: 10 }}
         ></div>
 
+        {/* Hitboxes ajustées PILE sur les anneaux (heurtoirs) */}
         {!isUnlocked && (
           <>
-            <div className="knocker-hitbox left" onClick={handleKnock}></div>
-            <div className="knocker-hitbox right" onClick={handleKnock}></div>
+            <div className="knocker-hitbox left" onClick={handleKnock} style={{ position: 'absolute', top: '56%', left: '45%', width: '4%', height: '6%', cursor: 'pointer', zIndex: 20 }} title="Frapper au heurtoir gauche"></div>
+            <div className="knocker-hitbox right" onClick={handleKnock} style={{ position: 'absolute', top: '56%', left: '51%', width: '4%', height: '6%', cursor: 'pointer', zIndex: 20 }} title="Frapper au heurtoir droit"></div>
           </>
         )}
       </div>
 
-      {/* ✅ NOUVELLE BOÎTE DE DIALOGUE (Même style que Room1) */}
-      {dialog && (
-        <div className="room1-message-box">
-          <button className="close-btn" onClick={() => setDialog(null)}>×</button>
-          <h3>{dialog.title}</h3>
-          <p>{dialog.text}</p>
-        </div>
+      {/* TEXTE SIMPLE EN BAS */}
+      {message && (
+        <p style={{ 
+          position: 'absolute', bottom: '10%', width: '100%', 
+          textAlign: 'center', color: '#fff', fontFamily: "'VT323', monospace", 
+          fontSize: '2rem', zIndex: 200, pointerEvents: 'none', padding: '0 20px',
+          textShadow: '3px 3px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000' 
+        }}>
+          {message}
+        </p>
       )}
     </div>
   );
