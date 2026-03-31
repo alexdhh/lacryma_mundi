@@ -527,3 +527,47 @@ p {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* --- EFFETS VISUELS DE LA SALLE --- */
+.overlay-effect {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  pointer-events: none; /* Pour ne pas bloquer les clics */
+  z-index: 9999;
+  opacity: 0;
+}
+
+/* Flashs de couleur */
+.flash-item { animation: flashItemAnim 0.8s ease-out; }
+.flash-blood { animation: flashBloodAnim 0.8s ease-out; }
+.flash-magic { animation: flashMagicAnim 1s ease-out; }
+
+@keyframes flashItemAnim {
+  0% { opacity: 0; background-color: rgba(255, 235, 150, 0.4); }
+  20% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes flashBloodAnim {
+  0% { opacity: 0; background-color: rgba(138, 3, 3, 0.6); }
+  15% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes flashMagicAnim {
+  0% { opacity: 0; background-color: rgba(100, 150, 255, 0.5); }
+  20% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Tremblement de l'écran (Appliqué au conteneur principal) */
+.shake-screen {
+  animation: shakeAnim 0.5s ease-in-out;
+}
+@keyframes shakeAnim {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-8px, 4px); }
+  40% { transform: translate(8px, -4px); }
+  60% { transform: translate(-8px, -4px); }
+  80% { transform: translate(8px, 4px); }
+  100% { transform: translate(0, 0); }
+}
