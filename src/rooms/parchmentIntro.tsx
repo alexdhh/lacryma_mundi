@@ -7,10 +7,10 @@ interface ParchmentIntroProps {
 }
 
 const introScript = [
-  "« Tu as tout perdu, Chevalier... Ton nom, tes terres, et même l'éclat de ton armure. »",
-  "« Mais il te reste ton épée, et ce serment que tu as fait devant sa tombe. »",
-  "« La Lacryma Mundi n'est pas un trésor pour les rois... c'est le dernier souffle d'une âme pure. La tienne peut-être. »",
-  "« Elle est là, au plus profond de la Basilique des Mille Soupirs. Elle t'appelle à travers la pierre... Ramène la Larme, et trouve enfin le repos. »"
+  "\"You have lost everything, Knight... your name, your lands, even the shine of your armor.\"",
+  "\"But your sword remains, and the oath you swore before her tomb.\"",
+  "\"Lacryma Mundi is no treasure for kings... it is the final breath of a pure soul. Perhaps yours.\"",
+  "\"It lies there, deep within the Basilica of a Thousand Sighs. It calls to you through stone... Bring back the Tear, and at last find rest.\""
 ];
 
 // Hook modifié pour gérer l'état "en cours d'écriture" et le "skip"
@@ -86,7 +86,7 @@ export default function ParchmentIntro({ onIntroFinished }: ParchmentIntroProps)
     >
       <img 
         src={parchmentImg} 
-        alt="Histoire" 
+        alt="Story" 
         style={{ 
           position: 'absolute', 
           top: 0, 

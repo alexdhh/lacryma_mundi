@@ -50,8 +50,8 @@ export default function Room1({ onSolve }: Room1Props) {
           setIsDoorOpen(true);
           setIsShaking(true);
           setDialog({ 
-            title: "Mécanisme Déverrouillé", 
-            text: "Un grondement sourd fait trembler les murs... Les lourdes portes s'ouvrent d'elles-mêmes !" 
+            title: "Mechanism Unlocked", 
+            text: "A deep rumble shakes the walls... The heavy doors open on their own!" 
           });
 
           // Le tremblement s'arrête après 1.5 secondes
@@ -62,7 +62,7 @@ export default function Room1({ onSolve }: Room1Props) {
 
         } else {
           // ERREUR
-          setDialog({ title: "Erreur", text: "Un souffle glacé éteint les regards... Essayez encore." });
+          setDialog({ title: "Error", text: "An icy breath extinguishes the gazes... Try again." });
           setTimeout(() => setActiveGargoyles([]), 1500);
         }
       }
@@ -75,8 +75,8 @@ export default function Room1({ onSolve }: Room1Props) {
       <div className={`room1-wrapper ${isShaking ? 'shake-screen' : ''}`} style={{ backgroundImage: `url(${bgImage})` }}>
         
         {/* Hitboxes interactives */}
-        <div className="hitbox grimoire-hitbox" onClick={() => setDialog({ title: "Grimoire", text: "« Seuls le Dévoreur, l'Aveugle et le Cornu feront verser la Larme. »" })}></div>
-        <div className="hitbox door-hitbox" onClick={() => !isDoorOpen && setDialog({ title: "Porte", text: "Scellée par une magie ancienne." })}></div>
+        <div className="hitbox grimoire-hitbox" onClick={() => setDialog({ title: "Grimoire", text: "\"Only the Devourer, the Blind One, and the Horned One shall make the Tear fall.\"" })}></div>
+        <div className="hitbox door-hitbox" onClick={() => !isDoorOpen && setDialog({ title: "Door", text: "Sealed by ancient magic." })}></div>
 
         {/* Les 5 Gargouilles */}
         {[0, 1, 2, 3, 4].map((id) => (

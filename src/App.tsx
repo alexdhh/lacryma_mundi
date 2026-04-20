@@ -6,6 +6,8 @@ import Door from './rooms/door';
 import Room1 from './rooms/room1';
 import ParchmentIntro from './rooms/parchmentIntro';
 import LmScenep from './rooms/lm_scenep'; 
+import LmCrypt from './rooms/lm_crypt';
+import LmLarme from './rooms/lm_larme';
 
 function App() {
   const [currentLocation, setCurrentLocation] = useState('home');
@@ -52,7 +54,7 @@ function App() {
     if (isPathReady && activeTransition === 'none') {
       triggerCinematic(
         'path', 
-        "Vous marchez le long du pont brumeux jusqu'aux grandes portes...", 
+        "You walk along the misty bridge toward the great gates...", 
         'porte'
       );
     }
@@ -63,7 +65,7 @@ function App() {
     if (activeTransition === 'none') {
       triggerCinematic(
         'door', 
-        "Les lourds battants cèdent. Vous pénétrez dans l'obscurité du Porche...", 
+        "The heavy doors give way. You step into the darkness of the Porch...", 
         'porche'
       );
     }
@@ -84,31 +86,34 @@ function App() {
       {currentLocation === 'home' && (
         /* Le zoom 'walking-forward' ne s'active que si la transition est 'path' */
         <div className={`intro-screen scene-fade-in ${activeTransition === 'path' ? 'walking-forward' : ''}`}>
-          <img src={introBg} alt="La Basilique" className="intro-background pixel-art" />
+          <img src={introBg} alt="The Basilica" className="intro-background pixel-art" />
           
           {isPathReady && (
-            <div 
-              className="path-hitbox" 
-              onClick={handlePathClick}
-              style={{ 
-                cursor: 'default',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                zIndex: 5,
-                clipPath: 'polygon(48% 44%, 58% 51%, 84% 58%, 95% 75%, 100% 100%, 35% 100%, 60% 85%, 70% 65%, 50% 50%)',
-              }}
-            ></div>
+            <>
+              <div 
+                className="path-hitbox" 
+                onClick={handlePathClick}
+                style={{ 
+                  cursor: 'pointer',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  zIndex: 5,
+                  clipPath: 'polygon(48% 44%, 58% 51%, 84% 58%, 95% 75%, 100% 100%, 35% 100%, 60% 85%, 70% 65%, 50% 50%)',
+                }}
+              ></div>
+            </>
           )}
 
           <div className={`intro-content ${isPathReady ? 'fade-out' : ''}`}>
             <h1>Lacryma Mundi</h1>
-            <p>La larme de crystal est gardée dans la cathédrale...</p>
+            <p>The Crystal Tear is guarded inside the cathedral...</p>
             <button onClick={handleStartGame} className="gothic-button-pure">
-              Commencer
+              Begin
             </button>
+            <p className="intro-devs">Developed by Tom FRANZI and Alex DRUZ</p>
           </div>
         </div>
       )}
@@ -138,7 +143,24 @@ function App() {
       {/* 5. LA SALLE PRINCIPALE (lm_scenep) */}
       {currentLocation === 'nef' && (
         <div className="scene-fade-in">
-          <LmScenep />
+          <LmScenep onEnterCrypt={() => setCurrentLocation('crypt')} />
+        </div>
+      )}
+
+      {/* 6. DESCENTE VERS LES CRYPTES */}
+      {currentLocation === 'crypt' && (
+        <div className="scene-fade-in">
+          <LmCrypt
+            onBack={() => setCurrentLocation('nef')}
+            onDescend={() => setCurrentLocation('larme')}
+          />
+        </div>
+      )}
+
+      {/* 7. LA LARME (ÉNIGME FINALE) */}
+      {currentLocation === 'larme' && (
+        <div className="scene-fade-in">
+          <LmLarme onReturnHome={() => setCurrentLocation('home')} />
         </div>
       )}
 

@@ -12,9 +12,15 @@ interface DialogState {
   text: string;
 }
 
-export default function LmScenep() {
+interface LmScenepProps {
+  onEnterCrypt: () => void;
+}
+
+export default function LmScenep({ onEnterCrypt }: LmScenepProps) {
   const [currentView, setCurrentView] = useState('main');
   const [isBookOpen, setIsBookOpen] = useState(false);
+  const [isFloorNavHovered, setIsFloorNavHovered] = useState(false);
+  const [isEnteringCrypt, setIsEnteringCrypt] = useState(false);
   
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [showBloodChoice, setShowBloodChoice] = useState(false);
@@ -72,7 +78,7 @@ export default function LmScenep() {
           currentView === 'ladder' ? bgLadder :
           bgStatue 
         } 
-        alt="Décor" 
+        alt="Scenery" 
         style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }} 
       />
 
@@ -83,13 +89,13 @@ export default function LmScenep() {
           <div 
             onClick={() => {
               triggerFlash('flash-dust');
-              setDialog({ title: "BOUGIES", text: "Leurs flammes vacillent étrangement, comme si la pièce respirait..." });
+              setDialog({ title: "CANDLES", text: "Their flames flicker strangely, as if the room itself were breathing..." });
             }} 
             style={{ position: 'absolute', bottom: '25%', left: '8%', width: '8%', height: '15%', cursor: 'pointer', zIndex: 10 }} 
           />
           <div 
             onClick={() => {
-              setDialog({ title: "BIBLIOTHÈQUE", text: "Des milliers d'ouvrages poussiéreux. Certains sont écrits dans des langues mortes depuis des millénaires." });
+              setDialog({ title: "LIBRARY", text: "Thousands of dusty volumes. Some are written in languages dead for millennia." });
             }} 
             style={{ position: 'absolute', top: '15%', left: '4%', width: '12%', height: '50%', cursor: 'pointer', zIndex: 10 }} 
           />
@@ -102,19 +108,35 @@ export default function LmScenep() {
             style={{ position: 'absolute', bottom: '10%', left: '16%', width: '15%', height: '18%', cursor: 'pointer', zIndex: 10 }} 
           />
           <div onClick={() => setCurrentView('archive')} style={{ position: 'absolute', top: '25%', left: '18%', width: '12%', height: '45%', cursor: 'pointer', zIndex: 10 }} />
-          <div onClick={() => setCurrentView('corridor')} style={{ position: 'absolute', bottom: '10%', left: '40%', width: '20%', height: '20%', cursor: 'pointer', zIndex: 10 }} />
+          <div
+            onClick={() => {
+              setIsFloorNavHovered(false);
+              setCurrentView('corridor');
+            }}
+            onMouseEnter={() => setIsFloorNavHovered(true)}
+            onMouseLeave={() => setIsFloorNavHovered(false)}
+            style={{ position: 'absolute', bottom: '10%', left: '40%', width: '20%', height: '20%', cursor: 'pointer', zIndex: 10 }}
+            title="Move forward into the room"
+          />
+
+          {isFloorNavHovered && (
+            <div className="main-floor-advance-hint" aria-hidden="true">
+              <span className="main-floor-advance-arrow">▲</span>
+              <span className="main-floor-advance-text">Advance</span>
+            </div>
+          )}
 
           {/* PORTE EN BOIS (Passé) */}
           <div 
             onClick={() => {
               if (hasPastSeal) {
-                setDialog({ title: "PASSAGE DE TERRE", text: "Le Passage de Terre est déjà ouvert." });
+                setDialog({ title: "EARTH PASSAGE", text: "The Earth Passage is already open." });
               } else if (hasWoodenHandle) {
                 triggerFlash('flash-dust-heavy', 1500); // Gros nuage de poussière
-                setDialog({ title: "PASSAGE DE TERRE", text: "Vous insérez la poignée en bois de chêne. La porte s'entrouvre dans un nuage de poussière...\nVous obtenez le Sceau du Passé !" });
+                setDialog({ title: "EARTH PASSAGE", text: "You insert the oak wooden handle. The door opens ajar in a cloud of dust...\nYou obtain the Seal of the Past!" });
                 setHasPastSeal(true);
               } else {
-                setDialog({ title: "PASSAGE DE TERRE", text: "Cette lourde porte en bois n'a pas de poignée. Elle est bloquée." });
+                setDialog({ title: "EARTH PASSAGE", text: "This heavy wooden door has no handle. It is jammed." });
               }
             }}
             style={{ position: 'absolute', top: '40%', left: '61%', width: '6%', height: '35%', cursor: 'pointer', zIndex: 10 }}
@@ -124,13 +146,13 @@ export default function LmScenep() {
           <div 
             onClick={() => {
               if (hasPresentSeal) {
-                setDialog({ title: "GRILLE DE FER", text: "La Grille de Fer est déjà ouverte." });
+                setDialog({ title: "IRON GATE", text: "The Iron Gate is already open." });
               } else if (hasIronKey) {
                 triggerFlash('flash-spark'); // Étincelle métallique
-                setDialog({ title: "GRILLE DE FER", text: "La lourde clé tourne dans la serrure dans un grincement aigu...\nVous obtenez le Sceau du Présent !" });
+                setDialog({ title: "IRON GATE", text: "The heavy key turns in the lock with a sharp screech...\nYou obtain the Seal of the Present!" });
                 setHasPresentSeal(true);
               } else {
-                setDialog({ title: "GRILLE DE FER", text: "Une solide grille de fer. Il vous faut une clé pour passer." });
+                setDialog({ title: "IRON GATE", text: "A solid iron gate. You need a key to pass." });
               }
             }}
             style={{ position: 'absolute', top: '35%', left: '71%', width: '8%', height: '45%', cursor: 'pointer', zIndex: 10 }}
@@ -140,13 +162,13 @@ export default function LmScenep() {
           <div 
             onClick={() => {
               if (hasFutureSeal) {
-                setDialog({ title: "VOIE DU CIEL", text: "La Voie du Ciel est déjà ouverte." });
+                setDialog({ title: "SKY WAY", text: "The Sky Way is already open." });
               } else if (hasRuneStone) {
                 triggerFlash('flash-magic'); // Éclat bleu
-                setDialog({ title: "VOIE DU CIEL", text: "Vous insérez la pierre. Les runes s'illuminent d'un éclat bleu...\nVous obtenez le Sceau de l'Avenir !" });
+                setDialog({ title: "SKY WAY", text: "You insert the stone. The runes light up in a blue glow...\nYou obtain the Seal of the Future!" });
                 setHasFutureSeal(true);
               } else {
-                setDialog({ title: "VOIE DU CIEL", text: "Une arche couverte de runes éteintes. Un emplacement circulaire est vide au centre." });
+                setDialog({ title: "SKY WAY", text: "An arch covered with dormant runes. A circular slot sits empty at its center." });
               }
             }}
             style={{ position: 'absolute', top: '15%', left: '83%', width: '15%', height: '75%', cursor: 'pointer', zIndex: 10 }}
@@ -156,10 +178,13 @@ export default function LmScenep() {
           <div 
             onClick={() => {
               if (hasPastSeal && hasPresentSeal && hasFutureSeal) {
+                if (isEnteringCrypt) return;
+                setIsEnteringCrypt(true);
                 triggerFlash('flash-magic');
-                setDialog({ title: "NEF SACRÉE", text: "Les trois Sceaux s'illuminent ! La grande double porte s'ouvre avec un fracas sourd... Vous pouvez passer à la suite !" });
+                setDialog({ title: "SACRED NAVE", text: "The three Seals ignite! The great double door opens with a deep crash... A stairway into the crypts is revealed." });
+                setTimeout(() => onEnterCrypt(), 2200);
               } else {
-                setDialog({ title: "NEF SACRÉE", text: "La Nef sacrée est scellée. Il vous manque des Sceaux pour l'ouvrir." });
+                setDialog({ title: "SACRED NAVE", text: "The Sacred Nave is sealed. You are missing Seals to open it." });
               }
             }}
             style={{ position: 'absolute', top: '35%', left: '45%', width: '10%', height: '30%', cursor: 'pointer', zIndex: 10 }}
@@ -187,15 +212,15 @@ export default function LmScenep() {
           onClick={() => {
             if (!hasWoodenHandle) {
               triggerFlash('flash-dust-heavy', 1500); 
-              setDialog({ title: "ARCHIVES OUBLIÉES", text: "En déplaçant de lourds grimoires, un épais nuage de poussière s'élève...\nAu fond d'une caisse, vous trouvez une Poignée en Bois de Chêne." });
+              setDialog({ title: "FORGOTTEN ARCHIVES", text: "As you shift heavy grimoires, a thick cloud of dust rises...\nAt the bottom of a crate, you find an Oak Wooden Handle." });
               setHasWoodenHandle(true);
             } else {
               triggerFlash('flash-dust');
-              setDialog({ title: "ARCHIVES OUBLIÉES", text: "Il n'y a plus rien d'utile ici. Seulement de vieux parchemins rongés par les mites." });
+              setDialog({ title: "FORGOTTEN ARCHIVES", text: "There is nothing useful left here. Only old parchments eaten by moths." });
             }
           }}
           style={{ position: 'absolute', top: '60%', left: '43%', width: '12%', height: '12%', cursor: 'pointer', zIndex: 10 }}
-          title="Examiner l'objet en bois"
+          title="Inspect the wooden object"
         />
       )}
 
@@ -205,14 +230,14 @@ export default function LmScenep() {
           onClick={() => {
             if (!hasRuneStone) {
               triggerFlash('flash-magic'); 
-              setDialog({ title: "ÉCHELLE FRAGILE", text: "L'échelle grince sous votre poids... À travers la lucarne, la lune éclaire un objet.\nVous trouvez une Pierre Runique Bleutée !" });
+              setDialog({ title: "FRAGILE LADDER", text: "The ladder creaks under your weight... Through the skylight, moonlight reveals an object.\nYou find a Bluish Rune Stone!" });
               setHasRuneStone(true);
             } else {
-              setDialog({ title: "ÉCHELLE FRAGILE", text: "Vous avez déjà récupéré la pierre runique. Il vaut mieux redescendre avant que le bois ne cède." });
+              setDialog({ title: "FRAGILE LADDER", text: "You already took the rune stone. Better climb down before the wood gives way." });
             }
           }}
           style={{ position: 'absolute', top: '22%', left: '57%', width: '8%', height: '16%', cursor: 'pointer', zIndex: 10 }}
-          title="Prendre la pierre runique"
+          title="Take the rune stone"
         />
       )}
 
@@ -221,10 +246,10 @@ export default function LmScenep() {
         <div 
           onClick={() => {
             if (!hasIronKey) {
-              setDialog({ title: "STATUE MACABRE", text: "La statue semble presque vivante... Elle serre un objet dans sa main droite.\nUne inscription sanglante indique : « Seul le sang versé au présent libère le fer »." });
+              setDialog({ title: "MACABRE STATUE", text: "The statue seems almost alive... It grips an object in its right hand.\nA bloody inscription reads: \"Only blood shed in the present frees the iron.\"" });
               setShowBloodChoice(true);
             } else {
-              setDialog({ title: "STATUE MACABRE", text: "La statue a relâché son emprise. Sa main de pierre, couverte de votre sang, est désormais vide." });
+              setDialog({ title: "MACABRE STATUE", text: "The statue has released its grip. Its stone hand, stained with your blood, is now empty." });
             }
           }}
           style={{ position: 'absolute', top: '20%', left: '30%', width: '40%', height: '60%', cursor: 'pointer', zIndex: 10 }}
@@ -234,7 +259,7 @@ export default function LmScenep() {
       {/* BOUTON RECULER */}
       {currentView !== 'main' && !dialog && (
         <div onClick={goBack} style={{ position: 'absolute', bottom: '2%', left: '50%', transform: 'translateX(-50%)', width: '40%', height: '10%', cursor: 'pointer', zIndex: 20, display: 'flex', justifyContent: 'center', alignItems: 'flex-end', paddingBottom: '20px' }}>
-          <p style={{ color: '#fff', fontFamily: "'VT323', monospace", fontSize: '2rem', textShadow: '2px 2px 0 #000', margin: 0 }}>▼ RECULER ▼</p>
+          <p style={{ color: '#fff', fontFamily: "'VT323', monospace", fontSize: '2rem', textShadow: '2px 2px 0 #000', margin: 0 }}>▼ GO BACK ▼</p>
         </div>
       )}
 
@@ -251,16 +276,16 @@ export default function LmScenep() {
                 <button 
                   onClick={() => {
                     triggerFlash('flash-blood'); // Gros Flash rouge
-                    setDialog({ title: "SACRIFICE", text: "Vous enfoncez la plume dans votre paume. La douleur est vive.\nAu contact du sang, la statue entrouvre ses doigts et laisse tomber une Lourde Clé en Fer." });
+                    setDialog({ title: "SACRIFICE", text: "You drive the quill into your palm. The pain is sharp.\nAt the touch of blood, the statue loosens its fingers and drops a Heavy Iron Key." });
                     setHasIronKey(true);
                     setShowBloodChoice(false);
                   }}
                   style={{ padding: '8px 16px', fontSize: '1.3rem', fontFamily: "'VT323', monospace", cursor: 'pointer', backgroundColor: '#3a1c1c', color: '#ffaaaa', border: '1px solid #c43535' }}
                 >
-                  Se piquer avec la plume
+                  Prick yourself with the quill
                 </button>
               ) : (
-                <p style={{ color: '#888', fontStyle: 'italic', fontSize: '1.2rem', fontFamily: "'VT323', monospace", margin: 0 }}>(Il vous faudrait un objet pointu pour verser votre propre sang...)</p>
+                <p style={{ color: '#888', fontStyle: 'italic', fontSize: '1.2rem', fontFamily: "'VT323', monospace", margin: 0 }}>(You would need a sharp object to spill your own blood...)</p>
               )}
             </div>
           )}
@@ -278,11 +303,11 @@ export default function LmScenep() {
                 e.stopPropagation(); 
                 if (!hasPlume) {
                   triggerFlash('flash-item'); 
-                  setDialog({ title: "BUREAU", text: "Vous prenez la plume affûtée. Sa pointe est incroyablement coupante." });
+                  setDialog({ title: "DESK", text: "You take the sharpened quill. Its tip is incredibly sharp." });
                   setHasPlume(true);
                   setIsBookOpen(false); 
                 } else {
-                  setDialog({ title: "BUREAU", text: "L'encrier est vide. L'encre a séché depuis longtemps." });
+                  setDialog({ title: "DESK", text: "The inkwell is empty. The ink dried out long ago." });
                 }
               }}
               style={{ position: 'absolute', bottom: '10%', right: '10%', width: '12%', height: '50%', cursor: 'pointer', zIndex: 110 }}
@@ -291,18 +316,18 @@ export default function LmScenep() {
             {/* TEXTES DU LIVRE */}
             <div style={{ position: 'absolute', top: '20%', left: '28%', width: '19%', height: '55%', fontFamily: "'Uncial Antiqua', serif", color: '#000000', fontWeight: 'bold', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <h2 style={{ fontSize: 'clamp(1.2rem, 2.2vw, 3rem)', color: '#4a154b', margin: '0 0 15px 0', lineHeight: '1.1' }}>LACRYMA MUNDI</h2>
-              <p style={{ color: '#000000', fontSize: 'clamp(0.7rem, 1.1vw, 1.4rem)', lineHeight: '1.4', margin: '0 0 15px 0' }}>"Trois voies s'ouvrent à droite de mon silence."</p>
-              <p style={{ color: '#000000', fontSize: 'clamp(0.7rem, 1.1vw, 1.4rem)', lineHeight: '1.4', margin: 0 }}>"Chacune garde un fragment de la vérité, mais seule la Vertu vous guidera."</p>
+              <p style={{ color: '#000000', fontSize: 'clamp(0.7rem, 1.1vw, 1.4rem)', lineHeight: '1.4', margin: '0 0 15px 0' }}>"Three paths open to the right of my silence."</p>
+              <p style={{ color: '#000000', fontSize: 'clamp(0.7rem, 1.1vw, 1.4rem)', lineHeight: '1.4', margin: 0 }}>"Each guards a fragment of truth, but only Virtue will guide you."</p>
             </div>
             <div style={{ position: 'absolute', top: '20%', left: '53%', width: '19%', height: '55%', fontFamily: "'Uncial Antiqua', serif", color: '#000000', fontWeight: 'bold', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <p style={{ color: '#000000', fontSize: 'clamp(0.6rem, 1vw, 1.3rem)', lineHeight: '1.4', margin: '0 0 12px 0' }}>"Le Passage de Terre (<strong style={{ color: '#4a154b' }}>Bois</strong>) ne s'ouvre que par le respect du PASSÉ."</p>
-              <p style={{ color: '#000000', fontSize: 'clamp(0.6rem, 1vw, 1.3rem)', lineHeight: '1.4', margin: '0 0 12px 0' }}>"La Grille de Fer (<strong style={{ color: '#4a154b' }}>Fer</strong>) ne s'efface que devant l'épreuve du PRÉSENT."</p>
-              <p style={{ color: '#000000', fontSize: 'clamp(0.6rem, 1vw, 1.3rem)', lineHeight: '1.4', margin: '0 0 12px 0' }}>"La Voie du Ciel (<strong style={{ color: '#4a154b' }}>Rune</strong>) ne se dévoile que pour celui qui voit l'AVENIR."</p>
-              <p style={{ color: '#000000', fontSize: 'clamp(0.6rem, 1vw, 1.3rem)', lineHeight: '1.4', margin: '15px 0 0 0', fontStyle: 'italic' }}>"Rappelez-vous ces trois piliers, car ils sont la clé de la Nef sacrée."</p>
+              <p style={{ color: '#000000', fontSize: 'clamp(0.6rem, 1vw, 1.3rem)', lineHeight: '1.4', margin: '0 0 12px 0' }}>"The Earth Passage (<strong style={{ color: '#4a154b' }}>Wood</strong>) opens only through respect for the PAST."</p>
+              <p style={{ color: '#000000', fontSize: 'clamp(0.6rem, 1vw, 1.3rem)', lineHeight: '1.4', margin: '0 0 12px 0' }}>"The Iron Gate (<strong style={{ color: '#4a154b' }}>Iron</strong>) yields only to the trial of the PRESENT."</p>
+              <p style={{ color: '#000000', fontSize: 'clamp(0.6rem, 1vw, 1.3rem)', lineHeight: '1.4', margin: '0 0 12px 0' }}>"The Sky Way (<strong style={{ color: '#4a154b' }}>Rune</strong>) reveals itself only to one who sees the FUTURE."</p>
+              <p style={{ color: '#000000', fontSize: 'clamp(0.6rem, 1vw, 1.3rem)', lineHeight: '1.4', margin: '15px 0 0 0', fontStyle: 'italic' }}>"Remember these three pillars, for they are the key to the Sacred Nave."</p>
             </div>
           </div>
           <p style={{ position: 'absolute', bottom: '20px', width: '100%', textAlign: 'center', color: '#fff', fontFamily: "'VT323', monospace", fontSize: '1.5rem', textShadow: '2px 2px 0 #000' }}>
-            (Cliquez en dehors du livre pour le fermer)
+            (Click outside the book to close it)
           </p>
         </div>
       )}

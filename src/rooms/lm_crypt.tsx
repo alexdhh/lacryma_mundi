@@ -9,12 +9,13 @@ interface DialogState {
 
 interface LmCryptProps {
   onBack: () => void; // Prop pour revenir à la Nef (LmScenep)
+  onDescend: () => void;
 }
 
-export default function LmCrypt({ onBack }: LmCryptProps) {
+export default function LmCrypt({ onBack, onDescend }: LmCryptProps) {
   const [dialog, setDialog] = useState<DialogState | null>({
-    title: "DESCENTE AUX CRYPTES",
-    text: "L'air devient glacial. Un escalier en colimaçon s'enfonce dans les ténèbres..."
+    title: "DESCENT INTO THE CRYPTS",
+    text: "The air turns icy. A spiral staircase sinks into the dark..."
   });
 
   // Timer ajusté à 6 secondes (6000 ms) pour la boîte de dialogue
@@ -35,7 +36,7 @@ export default function LmCrypt({ onBack }: LmCryptProps) {
       {/* Image de Fond */}
       <img 
         src={bgCrypt} 
-        alt="Descente aux cryptes" 
+        alt="Descent into the crypts" 
         style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }} 
       />
 
@@ -44,16 +45,14 @@ export default function LmCrypt({ onBack }: LmCryptProps) {
         <>
           {/* Interaction pour descendre plus bas (Zone sombre des marches) */}
           <div 
-            onClick={() => {
-              setDialog({ title: "PROFONDEURS", text: "Les marches sont glissantes. Vous sentez une présence oppressante plus bas..." });
-            }}
+            onClick={onDescend}
             style={{ position: 'absolute', bottom: '15%', left: '40%', width: '20%', height: '30%', cursor: 'pointer', zIndex: 10 }}
-            title="Descendre plus profondément"
+            title="Descend deeper"
           />
 
           {/* BOUTON RECULER (Retour à LmScenep) */}
           <div onClick={onBack} style={{ position: 'absolute', bottom: '2%', left: '50%', transform: 'translateX(-50%)', width: '40%', height: '10%', cursor: 'pointer', zIndex: 20, display: 'flex', justifyContent: 'center', alignItems: 'flex-end', paddingBottom: '20px' }}>
-            <p style={{ color: '#fff', fontFamily: "'VT323', monospace", fontSize: '2rem', textShadow: '2px 2px 0 #000', margin: 0 }}>▼ RECULER ▼</p>
+            <p style={{ color: '#fff', fontFamily: "'VT323', monospace", fontSize: '2rem', textShadow: '2px 2px 0 #000', margin: 0 }}>▼ GO BACK ▼</p>
           </div>
         </>
       )}

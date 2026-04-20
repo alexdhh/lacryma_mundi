@@ -12,7 +12,7 @@ export default function Door({ onEnter }: DoorProps) {
   const [isUnlocked, setIsUnlocked] = useState(false);
   
   // Retour au simple message texte
-  const [message, setMessage] = useState<string | null>("Deux lourds heurtoirs vous font face...");
+  const [message, setMessage] = useState<string | null>("Two heavy knockers stand before you...");
 
   // Disparition du texte après 6 secondes
   useEffect(() => {
@@ -30,13 +30,13 @@ export default function Door({ onEnter }: DoorProps) {
     setKnockCount(newCount);
 
     if (newCount === 1) {
-      setMessage("BAM... Un écho sourd résonne.");
+      setMessage("BAM... A dull echo answers.");
     }
     if (newCount === 2) {
-      setMessage("BAM... BAM... La pierre tremble légèrement.");
+      setMessage("BAM... BAM... The stone trembles slightly.");
     }
     if (newCount === 3) {
-      setMessage("BAM... BAM... BAM... Un silence pesant s'installe...");
+      setMessage("BAM... BAM... BAM... A heavy silence settles in...");
       setIsWaiting(true);
     }
   };
@@ -46,7 +46,7 @@ export default function Door({ onEnter }: DoorProps) {
       const timer = setTimeout(() => {
         setIsUnlocked(true);
         setIsWaiting(false);
-        setMessage("Un lourd mécanisme interne s'active. La porte cède...");
+        setMessage("A heavy internal mechanism awakens. The door yields...");
       }, 3000);
 
       return () => clearTimeout(timer);
@@ -57,7 +57,7 @@ export default function Door({ onEnter }: DoorProps) {
     if (isUnlocked) {
       onEnter();
     } else if (!isWaiting) {
-      setMessage("La porte est fermée de l'intérieur. Tirer ne sert à rien.");
+      setMessage("The door is barred from within. Pulling is useless.");
     }
   };
 
@@ -67,7 +67,7 @@ export default function Door({ onEnter }: DoorProps) {
       <div className={`door-wrapper ${isUnlocked ? 'unlocked' : ''}`} style={{ width: '100%', height: '100%', position: 'absolute' }}>
         <img 
           src={doorBg} 
-          alt="Portes fermées" 
+          alt="Closed doors" 
           className="door-image" 
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
@@ -82,8 +82,8 @@ export default function Door({ onEnter }: DoorProps) {
         {/* Hitboxes ajustées PILE sur les anneaux (heurtoirs) */}
         {!isUnlocked && (
           <>
-            <div className="knocker-hitbox left" onClick={handleKnock} style={{ position: 'absolute', top: '56%', left: '45%', width: '4%', height: '6%', cursor: 'pointer', zIndex: 20 }} title="Frapper au heurtoir gauche"></div>
-            <div className="knocker-hitbox right" onClick={handleKnock} style={{ position: 'absolute', top: '56%', left: '51%', width: '4%', height: '6%', cursor: 'pointer', zIndex: 20 }} title="Frapper au heurtoir droit"></div>
+            <div className="knocker-hitbox left" onClick={handleKnock} style={{ position: 'absolute', top: '56%', left: '45%', width: '4%', height: '6%', cursor: 'pointer', zIndex: 20 }} title="Knock the left knocker"></div>
+            <div className="knocker-hitbox right" onClick={handleKnock} style={{ position: 'absolute', top: '56%', left: '51%', width: '4%', height: '6%', cursor: 'pointer', zIndex: 20 }} title="Knock the right knocker"></div>
           </>
         )}
       </div>
